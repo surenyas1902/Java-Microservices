@@ -10,8 +10,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 
-import java.net.InetAddress;
-
 @Configuration
 @EnableWebSecurity
 public class WebSecurity {
@@ -28,7 +26,6 @@ public class WebSecurity {
                         .access(new WebExpressionAuthorizationManager("hasIpAddress('"+ipAddress+"')")))
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        System.out.println(InetAddress.getLocalHost().getHostAddress().toString());
         http.headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()));
         return http.build();
     }
