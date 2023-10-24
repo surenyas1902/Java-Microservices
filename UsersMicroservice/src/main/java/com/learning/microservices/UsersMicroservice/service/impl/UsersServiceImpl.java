@@ -6,10 +6,15 @@ import com.learning.microservices.UsersMicroservice.service.api.UsersService;
 import com.learning.microservices.UsersMicroservice.shared.UserDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+
+import java.util.ArrayList;
 import java.util.UUID;
 
 @Service
@@ -37,5 +42,21 @@ public class UsersServiceImpl implements UsersService {
 
         UserDto returnValue = mapper.map(entity, UserDto.class);
         return returnValue;
+    }
+
+    @Override
+    public UserDto getUserByEmail(String email) {
+        UserEntity entity = usersRepository.findByEmail(email);
+        if (entity == null) throw new UsernameNotFoundException(email);
+        return new ModelMapper().map(entity, UserDto.class);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        System.out.println("Inside Load User By Username");
+        UserEntity entity = usersRepository.findByEmail(username);
+        if (entity == null) throw new UsernameNotFoundException(username);
+        return new User(entity.getEmail(), entity.getEncryptedPassword(), true, true,
+                true, true, new ArrayList<>());
     }
 }
